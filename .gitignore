@@ -57,3 +57,4 @@ credentials.json
 _SUCCESS
 
 *.ipynb_checkpoints
+.dbt/
