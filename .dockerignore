@@ -1,0 +1,21 @@
+# Ignore data files
+data/
+*.csv
+*.gz
+*.zip
+*.parquet
+
+# Python cache
+__pycache__/
+*.pyc
+
+# venv or conda environments
+venv/
+.env/
+
+# Git stuff
+.git/
+.gitignore
+
+# Jupyter notebooks
+*.ipynb

@@ -1,0 +1,22 @@
+FROM bitnami/spark:latest
+
+WORKDIR /app
+
+# Copy Spark job
+COPY spark/wifi_usage_processing_spark.py /app/wifi_usage_processing_spark.py
+
+# Copy GCS connector
+COPY docker/jars/gcs-connector-hadoop3-latest.jar /app/gcs-connector-hadoop3-latest.jar
+
+# Copy GCP service account key
+COPY service-account.json /key.json
+
+# Spark submit with GCS connector
+CMD ["/opt/bitnami/spark/bin/spark-submit", \
+     "--master", "local[*]", \
+     "--jars", "/app/gcs-connector-hadoop3-latest.jar", \
+     "--conf", "spark.hadoop.fs.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem", \
+     "--conf", "spark.hadoop.fs.AbstractFileSystem.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS", \
+     "--conf", "spark.hadoop.google.cloud.auth.service.account.enable=true", \
+     "--conf", "spark.hadoop.google.cloud.auth.service.account.json.keyfile=/key.json", \
+     "/app/wifi_usage_processing_spark.py"]
