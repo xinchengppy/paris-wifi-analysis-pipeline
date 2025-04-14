@@ -1,0 +1,52 @@
+version: 2
+
+models:
+  - name: mart_annual_usage_by_district
+    description: >
+      Annual summary of Wi-Fi usage across Paris districts including sessions, duration, and hotspot activity.
+    columns:
+      - name: year
+        description: Year of aggregation
+      - name: district
+        description: Postal code representing the district
+      - name: total_sessions
+        description: Total number of sessions in the year
+      - name: total_duration_minutes
+        description: Total session time in minutes for the year
+      - name: average_duration_minutes
+        description: Average duration per session
+      - name: unique_sites
+        description: Number of unique hotspots used in the year
+        
+  - name: mart_usage_by_daytype
+    description: >
+      Annual average Wi-Fi usage metrics by day type (weekday, friday, weekend),
+      used to compare behavior differences in public Wi-Fi usage based on the day of the week.
+    columns:
+      - name: year
+        description: "Year of aggregation"
+        tests:
+          - not_null
+
+      - name: day_type
+        description: "Type of day (weekday, friday, weekend)"
+        tests:
+          - not_null
+
+      - name: num_days
+        description: "Number of days in the year that fall under this day type"
+
+      - name: total_sessions
+        description: "Total number of sessions during this day type for the year"
+
+      - name: total_duration_minutes
+        description: "Total duration of all sessions (in minutes) during this day type"
+
+      - name: avg_sessions_per_day
+        description: "Average number of sessions per day for this day type"
+
+      - name: avg_duration_per_day
+        description: "Average total Wi-Fi usage (minutes) per day for this day type"
+
+      - name: avg_session_duration
+        description: "Average duration of a single session in this day type"

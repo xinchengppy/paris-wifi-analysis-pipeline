@@ -32,8 +32,11 @@ df.coalesce(1) \
     .mode("overwrite") \
     .csv(cleaned_path)
 
+# Filter out invalid postal codes
+df_valid = df.filter(col("district").rlike(r"^\d{5}$"))
+
 # Aggregation: per day per district
-df_agg = df.groupBy("day", "is_weekend", "weekday_name", "district").agg(
+df_agg = df_valid.groupBy("day", "is_weekend", "weekday_name", "district").agg(
     count("*").alias("total_sessions"),
     _sum("session_minutes").alias("total_duration_minutes"),
     approx_count_distinct("code_site").alias("unique_sites"),

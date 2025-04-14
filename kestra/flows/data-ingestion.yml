@@ -1,0 +1,76 @@
+id: paris_wifi_pipeline
+namespace: pariswifi.project
+
+description: "Paris Wi-Fi - Download, Split & Upload"
+
+variables:
+  usage_filename: "paris_wifi_usage.csv"
+  sites_filename: "paris_wifi_sites_available.csv"
+  monthly_folder: "monthly"
+  gcs_sites_path: "data/paris_wifi_sites_available.csv"
+  gcs_monthly_prefix: "monthly/"
+
+tasks:
+  - id: download_csv
+    type: io.kestra.core.tasks.scripts.Bash
+    warningOnStdErr: false
+    commands:
+      - wget -O {{ vars.usage_filename }} "https://www.data.gouv.fr/fr/datasets/r/75e68d86-6718-451d-9713-6f986e258bb1"
+      - wget -O {{ vars.sites_filename }} "https://www.data.gouv.fr/fr/datasets/r/efcdbab7-e836-4149-9f91-40696e414a2e"
+      - echo "Download completed."
+    outputFiles:
+      - "{{ vars.usage_filename }}"
+      - "{{ vars.sites_filename }}"
+
+  - id: split_usage
+    type: io.kestra.plugin.scripts.python.Script
+    docker:
+      image: python:3.12-slim
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+    beforeCommands:
+      - pip install pandas unidecode
+    inputFiles:
+      paris_wifi_usage.csv: "{{ outputs.download_csv.outputFiles[vars.usage_filename] }}"
+    script: |
+      import pandas as pd
+      import re
+      from unidecode import unidecode
+      import os
+
+      def clean_col(col):
+          col = unidecode(col).lower().strip().replace(" ", "_").replace(".", "_")
+          col = re.sub(r"[()]", "", col)
+          col = re.sub(r"[^\w]", "", col)
+          return col
+
+      df = pd.read_csv("paris_wifi_usage.csv", sep=";")
+      df.columns = [clean_col(c) for c in df.columns]
+      df["date_heure_debut"] = pd.to_datetime(df["date_heure_debut"], errors="coerce")
+      df = df.dropna(subset=["date_heure_debut"])
+      df["month"] = df["date_heure_debut"].dt.to_period("M").astype(str)
+
+      os.makedirs("{{ vars.monthly_folder }}", exist_ok=True)
+      for month in df["month"].unique():
+          m_df = df[df["month"] == month].drop(columns=["month"])
+          m_df.to_csv(f"{{ vars.monthly_folder }}/usage_{month}.csv", sep=";", index=False)
+    outputFiles:
+      - "{{ vars.monthly_folder }}/usage_*.csv"
+
+  - id: upload_sites_to_gcs
+    type: io.kestra.plugin.gcp.gcs.Upload
+    from: "{{ outputs.download_csv.outputFiles[vars.sites_filename] }}"
+    to: "gs://paris-wifi-bucket/{{ vars.gcs_sites_path }}"
+
+  - id: upload_monthly_usage_to_gcs
+    type: io.kestra.plugin.gcp.gcs.Upload
+    from: "{{ outputs.split_usage.outputFiles['{{ vars.monthly_folder }}/usage_*.csv'] }}"
+    to: "gs://paris-wifi-bucket/{{ vars.gcs_monthly_prefix }}"
+
+pluginDefaults:
+  - type: io.kestra.plugin.gcp
+    values:
+      serviceAccount: "{{ secret('GCP_SERVICE_ACCOUNT') }}"
+      projectId: "{{ kv('GCP_PROJECT_ID') }}"
+      location: "{{ kv('GCP_LOCATION') }}"
+      bucket: "paris-wifi-bucket"

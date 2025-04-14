@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: mart_language_trends
+    description: >
+      Monthly distribution of system languages used by Wi-Fi users to analyze local vs. tourist traffic.
+    columns:
+      - name: month
+        description: First day of the month.
+      - name: system_language
+        description: Language of the user’s device.
+      - name: session_count
+        description: Number of sessions using that language in the given month.
+      - name: total_sessions
+        description: Total number of sessions in that month.
+      - name: share_percent
+        description: Percentage of sessions for the language within the month.

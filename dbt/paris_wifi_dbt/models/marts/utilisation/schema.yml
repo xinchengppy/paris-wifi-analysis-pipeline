@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: mart_site_load_by_district
+    description: >
+      Compare each district's average daily Wi-Fi usage against the number of available hotspots,
+      to highlight hotspot density and potential under/over-utilization.
+    columns:
+      - name: district
+        description: Postal code representing the district
+      - name: num_sites
+        description: Number of available public Wi-Fi hotspots in the district
+      - name: num_days
+        description: Number of days covered in the usage data
+      - name: total_sessions
+        description: Total sessions recorded in the district over the given period
+      - name: total_duration_minutes
+        description: Total session duration recorded in the district
+      - name: avg_sessions_per_day
+        description: Average number of sessions per day in the district
+      - name: avg_minutes_per_day
+        description: Average total session time per day in the district
+      - name: avg_sessions_per_site
+        description: Average number of sessions per site per day (load metric)

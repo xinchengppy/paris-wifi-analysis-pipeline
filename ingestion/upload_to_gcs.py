@@ -10,7 +10,7 @@ bucket = client.bucket(BUCKET_NAME)
 
 # 1. Upload sites data
 sites_path = "data/paris_wifi_sites_available.csv"
-blob = bucket.blob("paris_wifi_sites_available.csv")
+blob = bucket.blob("data/paris_wifi_sites_available.csv")
 blob.upload_from_filename(sites_path)
 
 # 2. Upload monthly split usage data

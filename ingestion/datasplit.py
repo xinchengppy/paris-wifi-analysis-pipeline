@@ -34,4 +34,4 @@ for month in df["month"].unique():
     month_df = df[df["month"] == month].drop(columns=["month"])
     output_path = f"data/monthly/usage_{month}.csv"
     month_df.to_csv(output_path, sep=";", index=False)
-    print(f"✅ Saved: {output_path}")
+    print(f"Saved: {output_path}")

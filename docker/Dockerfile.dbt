@@ -6,4 +6,5 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y git
 RUN pip install --no-cache-dir dbt-bigquery==1.7.9
 
-ENTRYPOINT ["bash"]
+ENTRYPOINT ["dbt"]
+

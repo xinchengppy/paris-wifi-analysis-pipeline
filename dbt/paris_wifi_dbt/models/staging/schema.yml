@@ -1,0 +1,72 @@
+# models/staging/wifi/schema.yml
+
+version: 2
+
+sources:
+  - name: paris_wifi_dataset
+    database: round-fold-449120-g9
+    schema: paris_wifi_dataset
+    tables:
+      - name: wifi_usage_cleaned
+      - name: agg_wifi_usage_daily
+      - name: wifi_sites_available
+
+models:
+  - name: stg_wifi_usage_cleaned
+    description: >
+      Cleaned and standardized Wi-Fi usage data with temporal and geographic features.
+    columns:
+      - name: day
+        description: Date of the session.
+      - name: is_weekend
+        description: Boolean indicating if the day is a weekend.
+      - name: weekday_name
+        description: Name of the day.
+      - name: site_code
+        description: Code of the site.
+      - name: district
+        description: Paris postal code.
+      - name: session_minutes
+        description: Duration of the session in minutes.
+      - name: site_name
+        description: Name of the hotspot (if applicable).
+      - name: start_time
+        description: Timestamp of the session start.
+      - name: device_type
+        description: Type of the device.
+      - name: system_language
+        description: Language of the system.
+
+  - name: stg_agg_wifi_usage_daily
+    description: "Aggregated daily Wi-Fi usage by district"
+    columns:
+      - name: day
+        description: Date of aggregation
+      - name: is_weekend
+        description: Boolean flag indicating if the day is a weekend
+      - name: weekday_name
+        description: Full name of the weekday
+      - name: district
+        description: Postal code representing the district
+      - name: total_sessions
+        description: Total number of Wi-Fi sessions on that day
+      - name: total_duration_minutes
+        description: Total session duration in minutes
+      - name: unique_sites
+        description: Number of unique hotspot sites used
+      - name: average_duration_minutes
+        description: Average duration of sessions in minutes
+
+  - name: stg_wifi_sites_available
+    description: "Metadata for each public wifi hotspot in Paris"
+    columns:
+      - name: site_name
+        description: Name of the wifi site
+      - name: address
+        description: Street address of the site
+      - name: district
+        description: Postal code of the site
+      - name: terminal_count
+        description: Number of active wifi terminals at the site
+      - name: site_status
+        description: Operational status of the site
