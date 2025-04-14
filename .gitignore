@@ -57,6 +57,6 @@ credentials.json
 _SUCCESS
 
 *.ipynb_checkpoints
-.dbt/
 
-dbt.log
+.dbt/
+*.jar*
