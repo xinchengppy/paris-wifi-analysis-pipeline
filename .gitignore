@@ -59,4 +59,5 @@ _SUCCESS
 *.ipynb_checkpoints
 
 .dbt/
+dbt.log
 *.jar*
