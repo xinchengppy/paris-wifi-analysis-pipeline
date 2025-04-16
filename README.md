@@ -114,7 +114,7 @@ You can explore the published dashboard here ([dashboard](https://lookerstudio.g
 - **Paris 1st district (75001)** shows the **highest utilization density** — in terms of both average session count and duration per site per day — despite having comparatively **fewer public hotspots**.
 - **2023 saw a significant rebound** in Wi-Fi usage following the Covid-19 pandemic. In contrast, **average session durations were lower in 2021 and 2022**, when restrictions were still widely in place.
 - **French, English, and Spanish** are the **most common device languages** detected on the Paris public Wi-Fi network. Notably, the **proportion of French-language users increased during the pandemic**, indicating stronger domestic usage during that period.
-- Interestingly, **public Wi-Fi usage drops on weekends** — both the **average session count and session duration** are consistently **lower on Fridays and weekends compared to weekdays(Mondays - Thursdays)**.
+-  Interestingly, public Wi-Fi usage **peaks on Fridays**, while both average session count and duration significantly **drop during weekends, compared to weekdays (Monday to Thursday)**.
 
 
 ## Setup & Reproduction Instructions
@@ -135,7 +135,7 @@ Ensure you have the following installed locally or on VM:
 git clone https://github.com/xinchengppy/paris-wifi-analysis-pipeline.git
 cd paris-wifi-analysis-pipeline
 ```
-and add `service-account.json` to the project root directory.
+and add GCP service account keys json file `service-account.json` (keep the exact same name) to the project root directory.
 
 ### 2. Provision GCP Infrastructure with Terraform
 modify [variables.tf](./terraform/variables.tf) using your GCP account information and run
@@ -172,13 +172,13 @@ docker run -it --rm \
   -v "$(pwd)/spark:/app" \
   spark-runner
 ```
-This executes wifi_usage_processing_spark.py to:
+This executes `wifi_usage_processing_spark.py` to:
 - Load monthly CSVs from GCS
 - Clean and aggregate into daily usage data
 - Upload the result to GCS
 
 ### 6. Create External Tables in BigQuery
-modify [gcs_to_bigquery.py](./warehouse/gcs_to_bigquery.py) using your GCP account information
+modify [gcs_to_bigquery.py](./warehouse/gcs_to_bigquery.py) **line 4-6** using your GCP account information
 Then run:
 ```bash
 python warehouse/gcs_to_bigquery.py
@@ -199,9 +199,9 @@ docker run -it \
   paris-wifi-dbt run --profiles-dir /root/.dbt
 ```
 This command:
-- Mounts your dbt project folder to /app
-- Mounts your local profiles.yml (for BigQuery config) from .dbt/
-- Provides the service account key and sets GOOGLE_APPLICATION_CREDENTIALS
+- Mounts your dbt project folder to `/app`
+- Mounts your local profiles.yml (for BigQuery config) from `.dbt/`
+- Provides the service account key and sets `GOOGLE_APPLICATION_CREDENTIALS`
 - Runs dbt run using your configured BigQuery dataset
 
 ✅ Make sure your .dbt/profiles.yml is correctly configured for BigQuery and references the same service account and project as the rest of the pipeline.
@@ -214,6 +214,7 @@ This command:
 ## Future Improvement Opportunities
 1. 	Automate Spark and dbt execution through scheduled Kestra workflows
 2.  Implement daily or weekly scheduling for real-time data analysis
+3.  Integrate unit tests to validate assumptions, null values, and schema consistency throughout the models
 
 
 ## Acknowledgments
