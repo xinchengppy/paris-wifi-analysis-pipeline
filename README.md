@@ -1,4 +1,5 @@
 # Paris Public Wi-Fi Usage Analysis
+An automated data pipeline analyzing public Wi-Fi usage in Paris, using Kestra for orchestration, Spark for transformation, GCS for data storage, Terraform for IaC, BigQuery + dbt for modeling, Looker Studio for data visualisation.
 
 ## Project Objective
 The goal of this project is to build an end-to-end data engineering pipeline that transforms raw open data into actionable insights about public Wi-Fi usage in Paris. This pipeline is designed to be automated, scalable, and cloud-native. Specifically, it aims to:
